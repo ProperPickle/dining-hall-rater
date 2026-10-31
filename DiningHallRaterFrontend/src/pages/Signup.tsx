@@ -26,7 +26,7 @@ function Signup() {
         const errorMessage = signUpResult.error?.message || signUpResult.error || "Sign up failed.";
         setError(errorMessage);
       } else {
-        setError("Sign up failed");
+        setError("Sign up failed.");
       }
     } catch (unexpectedError) {
       setError("An unexpected error occurred while trying to sign up.");
