@@ -1,9 +1,8 @@
 import { useRoutes } from 'react-router'
-import { AuthContextProvider } from './context/AuthContext.tsx'
+import './App.css'
 import Dashboard from './pages/Dashboard.tsx'
 import Signin from './pages/Signin.tsx'
 import Signup from './pages/Signup.tsx'
-import './App.css'
 
 function App() {
   let element = useRoutes([
@@ -27,9 +26,9 @@ function App() {
     }
   ])
   return (
-    <AuthContextProvider>
+    <>
       {element}
-    </AuthContextProvider>
+    </>
   )
 
 }
