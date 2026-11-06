@@ -4,6 +4,7 @@ import { supabase } from '../Client.ts';
 interface AuthContextType {
     session: any;
     signUpUser: (username: string, email: string, password: string) => Promise<AuthResult>;
+    signInUser: (email: string, password: string) => Promise<AuthResult>;
 }
 
 interface CustomErrorType {
@@ -126,9 +127,23 @@ export const AuthContextProvider = ({children}) => {
         return {success: true, data};
     };
 
+    const signInUser = async (email: string, password: string): Promise<AuthResult> => {
+        const {data, error} = await supabase.auth.signInWithPassword({
+            email: email.toLowerCase(),
+            password: password
+        });
+
+        if (error) {
+            logErrorMessage(error);
+            return {success: false, error};
+        }
+
+        return {success: true, data};
+    };
+
     return (
         <AuthContext.Provider
-            value={{session, signUpUser}}
+            value={{session, signUpUser, signInUser}}
         >
             {children}
         </AuthContext.Provider>
