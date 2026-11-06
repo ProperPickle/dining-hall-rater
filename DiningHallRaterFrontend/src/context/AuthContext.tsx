@@ -5,6 +5,7 @@ interface AuthContextType {
     session: any;
     signUpUser: (username: string, email: string, password: string) => Promise<AuthResult>;
     signInUser: (email: string, password: string) => Promise<AuthResult>;
+    signOutUser: () => Promise<AuthResult>;
 }
 
 interface CustomErrorType {
@@ -141,9 +142,18 @@ export const AuthContextProvider = ({children}) => {
         return {success: true, data};
     };
 
+    const signOutUser = async(): Promise<AuthResult> => {
+        const {error} = await supabase.auth.signOut();
+        if (error) {
+            logErrorMessage(error);
+            return {success: false, error};
+        }
+        return {success: true, data: null}
+    }
+
     return (
         <AuthContext.Provider
-            value={{session, signUpUser, signInUser}}
+            value={{session, signUpUser, signInUser, signOutUser}}
         >
             {children}
         </AuthContext.Provider>
