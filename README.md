@@ -21,5 +21,5 @@ Run the application with the following command
 npm run dev
 ```
 
-Confirmed to work for Node Version: 22.19.0
+Confirmed to work for Node Version: 22.19.0. \
 Make sure you create your .env file with the appropriate SUPABASE links.
