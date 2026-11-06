@@ -1,17 +1,17 @@
-import * as React from 'react'
-import * as ReactBootstrap from 'react-bootstrap'
-import { useState, useEffect } from 'react'
+import * as React from 'react';
+import * as ReactBootstrap from 'react-bootstrap';
+import { useState, useEffect } from 'react';
 import { Rating } from 'react-simple-star-rating';
-import './Dashboard.css'
+import './Dashboard.css';
 
-const { Badge, Button, Card } = ReactBootstrap
+const { Badge, Button, Card } = ReactBootstrap;
 
 function DiningHallCard({ location }) {
   const [rating, setRating] = useState(0);
 
   const handleRating = (rate: number) => {
     setRating(rate);
-  }  
+  };
 
   return (
     <>
@@ -25,7 +25,7 @@ function DiningHallCard({ location }) {
         </Card.Body>
       </Card>
     </>
-  )
+  );
 }
 
 function Dashboard() {
@@ -116,7 +116,7 @@ function Dashboard() {
         ))}
       </div>
     </div>
-  )
+  );
 
 }
 
