@@ -6,6 +6,7 @@ interface AuthContextType {
     signUpUser: (username: string, email: string, password: string) => Promise<AuthResult>;
     signInUser: (email: string, password: string) => Promise<AuthResult>;
     signOutUser: () => Promise<AuthResult>;
+    deleteAccount: () => Promise<AuthResult>;
 }
 
 interface CustomErrorType {
@@ -148,12 +149,24 @@ export const AuthContextProvider = ({children}) => {
             logErrorMessage(error);
             return {success: false, error};
         }
-        return {success: true, data: null}
+        return {success: true, data: null};
     }
+
+    const deleteAccount = async(): Promise<AuthResult> => {
+        console.log("Executing");
+        // Attempt to delete the user using their user id
+        const {error} = await supabase.rpc('delete_user_self');
+        if (error) {
+            logErrorMessage(error);
+            return {success: false, error};
+        }
+
+        return {success: true, data: null};
+    };
 
     return (
         <AuthContext.Provider
-            value={{session, signUpUser, signInUser, signOutUser}}
+            value={{session, signUpUser, signInUser, signOutUser, deleteAccount}}
         >
             {children}
         </AuthContext.Provider>
