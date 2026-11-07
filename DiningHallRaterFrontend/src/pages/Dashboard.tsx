@@ -123,12 +123,12 @@ function Dashboard() {
   const handleDeleteAccount = async (e) => {
     e.preventDefault();
 
-      const deletionResult = await deleteAccount();
-      if (deletionResult.success) {
-        navigate("/signin");
-      } else {
-        alert("An unexpected error ocurred while trying to deleting your account.");
-      }
+    const deletionResult = await deleteAccount();
+    if (deletionResult.success) {
+      navigate("/signin");
+    } else {
+      alert("An unexpected error ocurred while trying to deleting your account.");
+    }
   };
 
 
