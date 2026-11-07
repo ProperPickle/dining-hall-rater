@@ -112,23 +112,23 @@ function Dashboard() {
   const handleSignOut = async (e) => {
     e.preventDefault();
 
-    try {
-      await signOutUser();
+    const signOutResult = await signOutUser();
+    if (signOutResult.success) {
       navigate("/signin");
-    } catch (err) {
-      alert("An unexpected error occurred while trying to sign out.");
+    } else {
+      alert("An unexpected error ocurred while trying to signing out of your account.");
     }
   };
 
   const handleDeleteAccount = async (e) => {
     e.preventDefault();
 
-      const deletionResult = await deleteAccount();
-      if (deletionResult.success) {
-        navigate("/signin");
-      } else {
-        alert("An unexpected error ocurred while trying to deleting your account.");
-      }
+    const deletionResult = await deleteAccount();
+    if (deletionResult.success) {
+      navigate("/signin");
+    } else {
+      alert("An unexpected error ocurred while trying to deleting your account.");
+    }
   };
 
 
