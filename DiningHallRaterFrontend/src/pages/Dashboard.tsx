@@ -11,7 +11,7 @@ function Dashboard() {
   const { Badge, Button, Card } = ReactBootstrap;
 
   const [signOutError, setSignOutError] = useState(null);
-  const { signOutUser } = UserAuth();
+  const { session, signOutUser } = UserAuth();
   const [diningHalls, setDiningHalls] = useState([
     { 
       id: 1, 
@@ -117,7 +117,6 @@ function Dashboard() {
       navigate("/signin");
     } catch (err) {
       setSignOutError("An unexpected error occurred while signing out.");
-      console.log("fail")
     }
   };
 
@@ -127,7 +126,7 @@ function Dashboard() {
       <h1>Dining Hall Dashboard</h1>
       <p className="text-muted">Rate and review your favorite dining halls!</p>
 
-      <Button variant="primary" size="lg" className="w-100 fw-semibold" onClick={handleSignOut}>Sign Out</Button>
+      {session && <Button variant="primary" size="lg" className="w-100 fw-semibold" onClick={handleSignOut}>Sign Out</Button>}
       {signOutError && <p>{signOutError}</p>}
       <div className="dining-hall-cards">
         {diningHalls.map((location) => (
