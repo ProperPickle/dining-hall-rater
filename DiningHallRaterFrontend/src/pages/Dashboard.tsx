@@ -1,34 +1,17 @@
-import * as React from 'react'
-import * as ReactBootstrap from 'react-bootstrap'
-import { useState, useEffect } from 'react'
+import * as React from 'react';
+import * as ReactBootstrap from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
-import './Dashboard.css'
-
-const { Badge, Button, Card } = ReactBootstrap
-
-function DiningHallCard({ location }) {
-  const [rating, setRating] = useState(0);
-
-  const handleRating = (rate: number) => {
-    setRating(rate);
-  }  
-
-  return (
-    <>
-      <Card className="dining-hall-card">
-        <Card.Img variant="top" src={location.image} className="rounded-top" style = {{height:'180px', objectFit:'cover'}}/>
-        <Card.Body>
-          <Card.Title>{location.name}</Card.Title>
-          <Card.Text>{location.description}</Card.Text>
-          <Rating onClick={handleRating} initialValue={rating}></Rating>
-          <Button variant="primary" size="lg" className="w-100 fw-semibold">Add Review</Button>
-        </Card.Body>
-      </Card>
-    </>
-  )
-}
+import { UserAuth } from '../context/AuthContext.tsx';
+import './Dashboard.css';
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const { Badge, Button, Card } = ReactBootstrap;
+
+  const [signOutError, setSignOutError] = useState(null);
+  const { session, signOutUser } = UserAuth();
   const [diningHalls, setDiningHalls] = useState([
     { 
       id: 1, 
@@ -104,19 +87,54 @@ function Dashboard() {
     }
   ]);
 
+  function DiningHallCard({ location }) {
+    const [rating, setRating] = useState(0);
+
+    const handleRating = (rate: number) => {
+      setRating(rate);
+    };
+
+    return (
+      <>
+        <Card className="dining-hall-card">
+          <Card.Img variant="top" src={location.image} className="rounded-top" style = {{height:'180px', objectFit:'cover'}}/>
+          <Card.Body>
+            <Card.Title>{location.name}</Card.Title>
+            <Card.Text>{location.description}</Card.Text>
+            <Rating onClick={handleRating} initialValue={rating}></Rating>
+            <Button variant="primary" size="lg" className="w-100 fw-semibold">Add Review</Button>
+          </Card.Body>
+        </Card>
+      </>
+    );
+  }
+
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+
+    try {
+      await signOutUser();
+      navigate("/signin");
+    } catch (err) {
+      setSignOutError("An unexpected error occurred while signing out.");
+    }
+  };
+
 
   return (
     <div>
       <h1>Dining Hall Dashboard</h1>
       <p className="text-muted">Rate and review your favorite dining halls!</p>
 
+      {session && <Button variant="primary" size="lg" className="w-100 fw-semibold" onClick={handleSignOut}>Sign Out</Button>}
+      {signOutError && <p>{signOutError}</p>}
       <div className="dining-hall-cards">
         {diningHalls.map((location) => (
           <DiningHallCard key={location.id} location={location} />
         ))}
       </div>
     </div>
-  )
+  );
 
 }
 
