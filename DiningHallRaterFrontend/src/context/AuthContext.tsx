@@ -30,7 +30,7 @@ function createCustomError(name: string, message: string, status: number): Custo
 }
 
 function logErrorMessage(outputError: any): void {
-    console.error('Encountered an error while signing up:', outputError);
+    console.error('Encountered an error:', outputError);
 }
 
 const usernameExists = async(username: string):Promise<boolean> => {
