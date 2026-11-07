@@ -153,18 +153,12 @@ export const AuthContextProvider = ({children}) => {
     }
 
     const deleteAccount = async(): Promise<AuthResult> => {
-        // Get the user's id
-        const userIdQuery = await supabase.auth.getUser();
-        if (userIdQuery.error || userIdQuery.data.user === null) {
-            logErrorMessage(userIdQuery.error);
-            return {success: false, error: userIdQuery.error};
-        }
-
+        console.log("Executing");
         // Attempt to delete the user using their user id
-        const deletionQuery = await supabase.auth.admin.deleteUser(userIdQuery.data.user.id);
-        if (deletionQuery.error || deletionQuery.data.user === null) {
-            logErrorMessage(deletionQuery.error);
-            return {success: false, error: deletionQuery.error};
+        const {error} = await supabase.rpc('delete_user_self');
+        if (error) {
+            logErrorMessage(error);
+            return {success: false, error};
         }
 
         return {success: true, data: null};
