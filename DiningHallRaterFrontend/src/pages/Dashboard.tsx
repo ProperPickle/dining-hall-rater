@@ -34,7 +34,6 @@ function Dashboard() {
 
   const { session, signOutUser, deleteAccount } = UserAuth();
   const navigate = useNavigate();
-  const [page, setPage] = useState('Dashboard')
 
   const [diningHalls, setDiningHalls] = useState([
     { 
@@ -140,8 +139,8 @@ function Dashboard() {
       <p className="text-muted">Rate and review your favorite dining halls!</p>
 
       <div className='d-flex gap-2'>
-        <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>
-        <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>
+        {!session && <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>}
+        {!session && <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>}
       </div>
 
       {session && <Button variant="primary" size="sm" className="w-10 fw-semibold" onClick={handleSignOut}>Sign Out</Button>}
