@@ -6,11 +6,35 @@ import { useNavigate } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
 import { UserAuth } from '../context/AuthContext.tsx';
 import './Dashboard.css';
+const { Badge, Button, Card } = ReactBootstrap;
+
+function DiningHallCard({ location }) {
+  const [rating, setRating] = useState(0);
+
+  const handleRating = (rate: number) => {
+    setRating(rate);
+  };
+
+  return (
+    <>
+      <Card className="dining-hall-card">
+        <Card.Img variant="top" src={location.image} className="rounded-top" style = {{height:'180px', objectFit:'cover'}}/>
+        <Card.Body>
+          <Card.Title>{location.name}</Card.Title>
+          <Card.Text>{location.description}</Card.Text>
+          <Rating onClick={handleRating} initialValue={rating}></Rating>
+          <Button variant="primary" size="lg" className="w-25 fw-semibold">Add Review</Button>
+        </Card.Body>
+      </Card>
+    </>
+  );
+}
 
 function Dashboard() {
-  const { Badge, Button, Card } = ReactBootstrap;
+
   const { session, signOutUser, deleteAccount } = UserAuth();
   const navigate = useNavigate();
+  const [page, setPage] = useState('Dashboard')
 
   const [diningHalls, setDiningHalls] = useState([
     { 
@@ -87,28 +111,6 @@ function Dashboard() {
     }
   ]);
 
-  function DiningHallCard({ location }) {
-    const [rating, setRating] = useState(0);
-
-    const handleRating = (rate: number) => {
-      setRating(rate);
-    };
-
-    return (
-      <>
-        <Card className="dining-hall-card">
-          <Card.Img variant="top" src={location.image} className="rounded-top" style = {{height:'180px', objectFit:'cover'}}/>
-          <Card.Body>
-            <Card.Title>{location.name}</Card.Title>
-            <Card.Text>{location.description}</Card.Text>
-            <Rating onClick={handleRating} initialValue={rating}></Rating>
-            <Button variant="primary" size="lg" className="w-25 fw-semibold">Add Review</Button>
-          </Card.Body>
-        </Card>
-      </>
-    );
-  }
-
   const handleSignOut = async (e) => {
     e.preventDefault();
 
@@ -136,6 +138,11 @@ function Dashboard() {
     <div>
       <h1>Dining Hall Dashboard</h1>
       <p className="text-muted">Rate and review your favorite dining halls!</p>
+
+      <div className='d-flex gap-2'>
+        <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>
+        <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>
+      </div>
 
       {session && <Button variant="primary" size="sm" className="w-10 fw-semibold" onClick={handleSignOut}>Sign Out</Button>}
       {session && <Button variant="danger" size="sm" className="w-10 fw-semibold" onClick={handleDeleteAccount}>Delete Account</Button>}
