@@ -10,6 +10,8 @@ const { Badge, Button, Card } = ReactBootstrap;
 
 function DiningHallCard({ location }) {
   const [rating, setRating] = useState(0);
+  const { session, signOutUser, deleteAccount } = UserAuth();
+  const navigate = useNavigate();
 
   const handleRating = (rate: number) => {
     setRating(rate);
@@ -23,7 +25,8 @@ function DiningHallCard({ location }) {
           <Card.Title>{location.name}</Card.Title>
           <Card.Text>{location.description}</Card.Text>
           <Rating onClick={handleRating} initialValue={rating}></Rating>
-          <Button variant="primary" size="lg" className="w-25 fw-semibold">Add Review</Button>
+          {!session && <Button variant="primary" size="lg" className="w-25 fw-semibold" onClick={() => navigate('/signup')}>Add Review</Button> 
+          || session && <Button variant="primary" size="lg" className="w-25 fw-semibold" >Add Review</Button>}
         </Card.Body>
       </Card>
     </>
