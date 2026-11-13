@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
 import { UserAuth } from '../context/AuthContext.tsx';
+import MyMap from '../components/Map.tsx';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -136,13 +137,17 @@ function Dashboard() {
     <div>
       <h1>Dining Hall Dashboard</h1>
       <p className="text-muted">Rate and review your favorite dining halls!</p>
-
       {session && <Button variant="primary" size="sm" className="w-10 fw-semibold" onClick={handleSignOut}>Sign Out</Button>}
       {session && <Button variant="danger" size="sm" className="w-10 fw-semibold" onClick={handleDeleteAccount}>Delete Account</Button>}
-      <div className="dining-hall-cards">
-        {diningHalls.map((location) => (
-          <DiningHallCard key={location.id} location={location} />
-        ))}
+      <div className="dashboard-content">
+        <div className="dining-hall-cards">
+          {diningHalls.map((location) => (
+            <DiningHallCard key={location.id} location={location} />
+          ))}
+        </div>
+        <div className="map-container">
+          <MyMap/>
+        </div>
       </div>
     </div>
   );
