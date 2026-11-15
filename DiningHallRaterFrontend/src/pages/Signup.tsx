@@ -1,35 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router';
-import { UserAuth } from '../context/AuthContext.tsx'
+import axios from 'axios';
 import './Signup.css'
 
-function Signup() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+function Signup({setUser}) {
+ const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: ""
+  });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { signUpUser } = UserAuth();
   const navigate = useNavigate();
 
-  const handleSignUp = async(event) => {
+  const handleSignUp = async (event) => {
     event.preventDefault(); // Prevents page from refreshing when the form is submitted
     setLoading(true);
 
     try {
       // Database call
-      const signUpResult = await signUpUser(username, email, password);
-      if (signUpResult.success) {
-        navigate('/');
-      } else if ('error' in signUpResult) {
-        const errorMessage = signUpResult.error?.message || signUpResult.error || "Sign up failed.";
-        setError(errorMessage);
-      } else {
-        setError("Sign up failed.");
-      }
-    } catch (unexpectedError) {
-      setError("An unexpected error occurred while trying to sign up.");
+      const signUpResult = await axios.post("/api/auth/signup", form);
+      setUser(signUpResult.data);
+      navigate("/");
+    } catch (signUpError) {
+      const errorMessage = signUpError.response?.data?.message || signUpError.message || "An error occurred while signing up.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -40,7 +36,7 @@ function Signup() {
       <h1>Signup</h1>
       <form onSubmit={handleSignUp}>
         <input
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setForm({...form, name: e.target.value})}
           className="p-3 mt-2"
           type="username"
           name="username"
@@ -48,7 +44,7 @@ function Signup() {
           placeholder="Username"
         />
         <input
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setForm({...form, email: e.target.value})}
           className="p-3 mt-2"
           type="email"
           name="email"
@@ -56,7 +52,7 @@ function Signup() {
           placeholder="Email"
         />
         <input
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setForm({...form, password: e.target.value})}
           className="p-3 mt-2"
           type="password"
           name="password"
