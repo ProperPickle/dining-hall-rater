@@ -11,7 +11,7 @@ export const verifyUser = async (req, res, next) => {
 
         const decodedJWT = jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await pool.query("SELECT id, name, email FROM users WHERE id = $1", [decodedJWT.id]);
+        const user = await pool.query("SELECT user_id, name, email FROM users WHERE user_id = $1", [decodedJWT.user_id]);
 
         if (user.rows.length === 0) {
             return res.status(401).json({message: "Not authorized: user not found."});

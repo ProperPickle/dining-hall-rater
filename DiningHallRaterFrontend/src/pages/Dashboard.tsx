@@ -1,11 +1,12 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import * as ReactBootstrap from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
-import { UserAuth } from '../context/AuthContext.tsx';
+import axios from 'axios';
 import Map from '../components/Map.tsx';
+
 import './Dashboard.css';
 const { Badge, Button, Card } = ReactBootstrap;
 
@@ -31,9 +32,9 @@ function DiningHallCard({ location }) {
   );
 }
 
-function Dashboard() {
+function Dashboard({user, setUser}) {
 
-  const { session, signOutUser, deleteAccount } = UserAuth();
+ 
   const navigate = useNavigate();
 
   const [diningHalls, setDiningHalls] = useState([
@@ -126,24 +127,32 @@ function Dashboard() {
   const handleSignOut = async (e) => {
     e.preventDefault();
 
-    const signOutResult = await signOutUser();
-    if (signOutResult.success) {
+    try {
+      const signOutResult = await axios.post("/api/auth/signout");
+      setUser(null);
       navigate("/signin");
-    } else {
-      alert("An unexpected error ocurred while trying to signing out of your account.");
+    } catch (signOutError) {
+      alert("An unexpected error ocurred while trying to sign out of your account.");
+      console.error(signOutError);
     }
   };
 
+  
   const handleDeleteAccount = async (e) => {
     e.preventDefault();
-
-    const deletionResult = await deleteAccount();
-    if (deletionResult.success) {
-      navigate("/signin");
-    } else {
-      alert("An unexpected error ocurred while trying to deleting your account.");
+  
+    try {
+      const accountDeletionResult = await axios.delete(`/api/auth/user/${user?.user?.user_id}`);
+      setUser(null);
+      navigate("/signup");
+    } catch (accountDeletionError) {
+      console.log(user)
+      const errorMessage = accountDeletionError.response?.data?.message || accountDeletionError.message || "An error occurred while signing up.";
+      alert("An unexpected error ocurred while trying to delete your account.");
+      console.error(errorMessage);
     }
   };
+  
 
 
   return (
@@ -152,21 +161,16 @@ function Dashboard() {
       <p className="text-muted">Rate and review your favorite dining halls!</p>
 
       <div className='d-flex gap-2'>
-        {!session && <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>}
-        {!session && <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>}
+        {!user && <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>}
+        {!user && <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>}
+        {user && <Button variant="primary" onClick={handleSignOut}>Sign Out</Button>}
+        {user && <Button variant="danger" onClick={handleDeleteAccount}>Delete Account</Button>}
       </div>
 
-      {session && <Button variant="primary" size="sm" className="w-10 fw-semibold" onClick={handleSignOut}>Sign Out</Button>}
-      {session && <Button variant="danger" size="sm" className="w-10 fw-semibold" onClick={handleDeleteAccount}>Delete Account</Button>}
-      <div className="dashboard-content">
-        <div className="dining-hall-cards">
-          {diningHalls.map((location) => (
-            <DiningHallCard key={location.id} location={location} />
-          ))}
-        </div>
-        <div className="map-container">
-          <Map locations={diningHalls} />
-        </div>
+      <div className="dining-hall-cards">
+        {diningHalls.map((location) => (
+          <DiningHallCard key={location.id} location={location} />
+        ))}
       </div>
     </div>
   );

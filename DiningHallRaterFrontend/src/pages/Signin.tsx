@@ -1,34 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router';
-import { UserAuth } from '../context/AuthContext.tsx'
+import axios from 'axios';
 import './Signin.css'
 
-function Signin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+function Signin({setUser}) {
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  });
+
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signInUser } = UserAuth();
   const navigate = useNavigate();
 
-  const handleSignIn = async(event) => {
+  const handleSignIn = async (event) => {
     event.preventDefault(); // Prevents page from refreshing when the form is submitted
     setLoading(true);
 
     try {
       // Database call
-      const signInResult = await signInUser(email, password);
-      if (signInResult.success) {
-        navigate('/');
-      } else if ('error' in signInResult) {
-        const errorMessage = signInResult.error?.message || signInResult.error || "Sign in failed.";
-        setError(errorMessage);
-      } else {
-        setError("Sign in failed.");
-      }
-    } catch (unexpectedError) {
-      setError("An unexpected error occurred while trying to sign in.");
+      const signInResult = await axios.post("/api/auth/signin", form);
+      setUser(signInResult.data);
+      navigate("/");
+    } catch (signInError) {
+      const errorMessage = signInError.response?.data?.message || signInError.message || "Invalid sign in credentials.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -39,7 +36,7 @@ function Signin() {
       <h1>Sign in</h1>
       <form onSubmit={handleSignIn}>
         <input
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setForm({...form, email: e.target.value})}
           className="p-3 mt-2"
           type="email"
           name="email"
@@ -47,7 +44,7 @@ function Signin() {
           placeholder="Email"
         />
         <input
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setForm({...form, password: e.target.value})}
           className="p-3 mt-2"
           type="password"
           name="password"
