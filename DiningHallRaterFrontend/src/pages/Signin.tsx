@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router';
-import axios from 'axios';
 import './Signin.css'
 
 function Signin({setUser}) {
@@ -20,12 +19,25 @@ function Signin({setUser}) {
 
     try {
       // Database call
-      const signInResult = await axios.post("/api/auth/signin", form);
-      setUser(signInResult.data);
+      const signInResult = await fetch("/api/auth/signin", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(form),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      const signInResultJSON = await signInResult.json();
+
+      if (!signInResult.ok) {
+        setError(signInResultJSON.message || "Invalid sign in credentials.");
+        return;
+      }
+
+      setUser(signInResultJSON.user);
       navigate("/");
     } catch (signInError) {
-      const errorMessage = signInError.response?.data?.message || signInError.message || "Invalid sign in credentials.";
-      setError(errorMessage);
+      setError("An unexpected error occurred while signing in.");
     } finally {
       setLoading(false);
     }

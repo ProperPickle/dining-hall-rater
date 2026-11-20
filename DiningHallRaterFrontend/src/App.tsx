@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRoutes, Navigate } from 'react-router';
-import axios from 'axios';
 // import { AuthContextProvider } from './context/AuthContext.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import Signin from './pages/Signin.tsx';
 import Signup from './pages/Signup.tsx';
 import './App.css';
-
-// Sends cookies with every request
-axios.defaults.withCredentials = true;
 
 function App() {
   const [user, setUser] = useState(null);
@@ -19,10 +15,19 @@ function App() {
     const fetchUser = async () => {
       try {
         // Get the current user's data
-        const res = await axios.get("/api/auth/me");
-        setUser(res.data);
+        const getUserDataResult = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include"
+        });
+
+        const getUserDataResultJSON = await getUserDataResult.json();
+        if (!getUserDataResult.ok) {
+          console.error(getUserDataResultJSON.message || "Could not get user's data");
+          return;
+        }
+        setUser(getUserDataResultJSON.user);
       } catch (err) {
-        console.log(err);
+        console.error("An unexpected error occurred while getting the user's data");
         setUser(null);
       } finally {
         setLoading(false);

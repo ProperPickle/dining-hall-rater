@@ -4,7 +4,6 @@ import * as ReactBootstrap from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
-import axios from 'axios';
 import Map from '../components/Map.tsx';
 
 import './Dashboard.css';
@@ -128,11 +127,19 @@ function Dashboard({user, setUser}) {
     e.preventDefault();
 
     try {
-      const signOutResult = await axios.post("/api/auth/signout");
+      const signOutResult = await fetch("/api/auth/signout", {
+        method: "POST",
+        credentials: "include"
+      });
+      
+      if (!signOutResult.ok) {
+        throw new Error();
+      }
+
       setUser(null);
       navigate("/signin");
     } catch (signOutError) {
-      alert("An unexpected error ocurred while trying to sign out of your account.");
+      alert("An unexpected error occurred while trying to sign out of your account.");
       console.error(signOutError);
     }
   };
@@ -142,14 +149,22 @@ function Dashboard({user, setUser}) {
     e.preventDefault();
   
     try {
-      const accountDeletionResult = await axios.delete(`/api/auth/user/${user?.user?.user_id}`);
+      const accountDeletionResult = await fetch(`/api/auth/user/${user?.user_id}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      if (!accountDeletionResult.ok) {
+        const accountDeletionResultJSON = await accountDeletionResult.json();
+        console.error(accountDeletionResultJSON.message || "Could not delete account.");
+        return;
+      }
+      
       setUser(null);
       navigate("/signup");
     } catch (accountDeletionError) {
-      console.log(user)
-      const errorMessage = accountDeletionError.response?.data?.message || accountDeletionError.message || "An error occurred while signing up.";
       alert("An unexpected error ocurred while trying to delete your account.");
-      console.error(errorMessage);
+      console.error(accountDeletionError);
     }
   };
   
