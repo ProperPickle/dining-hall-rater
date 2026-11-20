@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import pool from '../config/db.ts';
 import { cookie } from 'express/lib/response.js';
 import { verifyUser } from '../middleware/auth.ts'
+import { parse } from 'dotenv';
 
 const router = express.Router();
 
@@ -123,6 +124,49 @@ router.delete('/user/:user_id', async (req, res) => {
 
     res.cookie('token', '', {...cookieOptions, maxAge: 1});
     return res.status(200).json({message: 'Deleted account successfully.'});
+})
+
+// Get reviews
+router.get('/reviews', async (req, res) => {
+    try {
+        let page = parseInt(req?.query?.page) || 1;
+        let perPage = parseInt(req?.query?.perPage) || 10;
+
+        if (perPage > 10000) {
+            perPage = 10000;
+        }
+        if (perPage < 0) {
+            perPage = 10;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        const offset = ((page - 1) * perPage);
+        const selectedReviews = await pool.query('SELECT * FROM reviews ORDER BY created_at LIMIT $1 OFFSET $2', [perPage, offset]);
+        return res.status(200).json({page: page, perPage: perPage, reviews: selectedReviews.rows});
+    } catch (reviewsError) {
+        return res.status(500).json({message: 'Failed to fetch reviews.'});
+    }
+})
+
+// Get locations
+router.get('/locations', async (req, res) => {
+    try {
+        const locationId = parseInt(req?.query?.id) || null;
+        let paramsList = [];
+
+        let query = 'SELECT * FROM locations';
+        if (locationId != null) {
+            query += ' WHERE location_id = $1';
+            paramsList.push(locationId);
+        }
+       
+        const selectedLocations = await pool.query(query, paramsList);
+        return res.status(200).json({locations: selectedLocations.rows});
+    } catch (reviewsError) {
+        return res.status(500).json({message: 'Failed to fetch locations.'});
+    }
 })
 
 export default router;
