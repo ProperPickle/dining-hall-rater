@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router';
-import axios from 'axios';
 import './Signup.css'
 
 function Signup({setUser}) {
@@ -9,7 +8,7 @@ function Signup({setUser}) {
     email: "",
     password: ""
   });
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -20,12 +19,25 @@ function Signup({setUser}) {
 
     try {
       // Database call
-      const signUpResult = await axios.post("/api/auth/signup", form);
-      setUser(signUpResult.data);
+      const signUpResult = await fetch("/api/auth/signup", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify(form),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      const signUpResultJSON = await signUpResult.json();
+      if (!signUpResult.ok) {
+        setError(signUpResultJSON.message || "Invalid sign up credentials");
+        return;
+      }
+
+      setUser(signUpResultJSON.user);
       navigate("/");
     } catch (signUpError) {
-      const errorMessage = signUpError.response?.data?.message || signUpError.message || "An error occurred while signing up.";
-      setError(errorMessage);
+      setError("An error occurred while signing up.");
     } finally {
       setLoading(false);
     }
