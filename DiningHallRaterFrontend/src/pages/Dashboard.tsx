@@ -147,17 +147,28 @@ function Dashboard() {
 
 
   return (
-    <div>
-      <h1>Dining Hall Dashboard</h1>
-      <p className="text-muted">Rate and review your favorite dining halls!</p>
+    <div className="dashboard-page">
+      <div className="d-flex justify-content-between align-items-center p-3 flex-shrink-0">
+        <div>
+          <h1 className="mb-0">Dining Hall Dashboard</h1>
+          <p className="text-muted mb-0">Rate and review your favorite dining halls!</p>
+        </div>
 
-      <div className='d-flex gap-2'>
-        {!session && <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>}
-        {!session && <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>}
+        <div className="d-flex gap-2 flex-shrink-0">
+          {!session ? (
+            <>
+              <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>
+              <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>
+            </>
+          ) : (
+            <>
+              <Button variant="primary" size="sm" className="fw-semibold" onClick={handleSignOut}>Sign Out</Button>
+              <Button variant="danger" size="sm" className="fw-semibold" onClick={handleDeleteAccount}>Delete Account</Button>
+            </>
+          )}
+        </div>
       </div>
 
-      {session && <Button variant="primary" size="sm" className="w-10 fw-semibold" onClick={handleSignOut}>Sign Out</Button>}
-      {session && <Button variant="danger" size="sm" className="w-10 fw-semibold" onClick={handleDeleteAccount}>Delete Account</Button>}
       <div className="dashboard-content">
         <div className="dining-hall-cards">
           {diningHalls.map((location) => (
