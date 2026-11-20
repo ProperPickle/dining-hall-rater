@@ -173,9 +173,12 @@ const [diningHalls, setDiningHalls] = useState([
 
 
   return (
-    <div>
-      <h1>Dining Hall Dashboard</h1>
-      <p className="text-muted">Rate and review your favorite dining halls!</p>
+    <div className="dashboard-page">
+      <div className="d-flex justify-content-between align-items-center p-3 flex-shrink-0">
+        <div>
+          <h1 className="mb-0">Dining Hall Dashboard</h1>
+          <p className="text-muted mb-0">Rate and review your favorite dining halls!</p>
+        </div>
 
       <div className='d-flex gap-2'>
         {!user && <Button variant="outline-primary" onClick={() => navigate('/signin')}>Sign In</Button>}
