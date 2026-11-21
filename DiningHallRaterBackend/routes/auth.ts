@@ -8,7 +8,6 @@ import { parse } from 'dotenv';
 
 const router = express.Router();
 
-// Register a new user
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -23,6 +22,7 @@ const generateToken = (user_id) => {
     });
 }
 
+// Sign up
 router.post('/signup', async (req, res) => {
     const {name, email, password} = req.body;
 
@@ -32,11 +32,11 @@ router.post('/signup', async (req, res) => {
 
     const formattedName = name.replace(/\s/g, "");
     if (formattedName.length < 3 || formattedName.length > 24) {
-        return res.status(422).json({message: 'Username should have between 3 and 24 non-space characters.'})
+        return res.status(422).json({message: 'Username should have between 3 and 24 non-space characters.'});
     }
 
     if (password.length < 6 || formattedName.length > 50) {
-        return res.status(422).json({message: 'Password should have between 6 and 50 characters.'})
+        return res.status(422).json({message: 'Password should have between 6 and 50 characters.'});
     }
 
     // Check if email exists
@@ -150,6 +150,31 @@ router.get('/reviews', async (req, res) => {
     }
 })
 
+// Post review
+router.post('/reviews', verifyUser, async (req, res) => {
+    try {
+        const {rating, textContent, locationId} = req.body;
+        const verifiedUser = req.user;
+
+        if (!rating) {
+            return res.status(400).json({message: 'Missing required rating.'});
+        }
+        if (!locationId) {
+            return res.status(400).json({message: 'Missing required location id.'});
+        }
+        if (textContent && textContent.length > 500) {
+            return res.status(400).json({message: 'Text content must be 500 characters or less.'});
+        }
+        
+        const newReview = await pool.query('INSERT INTO reviews (rating, text_content, location_id, poster_id) VALUES ($1, $2, $3, $4) RETURNING location_id, rating, text_content, poster_id',
+            [rating, textContent, locationId, verifiedUser.user_id]
+        );
+        return res.status(200).json({newReview: newReview.rows[0]});
+    } catch (reviewsError) {
+        return res.status(500).json({message: 'Failed to fetch locations.'});
+    }
+})
+
 // Get locations
 router.get('/locations', async (req, res) => {
     try {
@@ -168,5 +193,6 @@ router.get('/locations', async (req, res) => {
         return res.status(500).json({message: 'Failed to fetch locations.'});
     }
 })
+
 
 export default router;
