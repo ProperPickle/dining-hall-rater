@@ -4,10 +4,10 @@ import jwt from 'jsonwebtoken';
 import pool from '../config/db.ts';
 import { cookie } from 'express/lib/response.js';
 import { verifyUser } from '../middleware/auth.ts'
+import { parse } from 'dotenv';
 
 const router = express.Router();
 
-// Register a new user
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -22,6 +22,7 @@ const generateToken = (user_id) => {
     });
 }
 
+// Sign up
 router.post('/signup', async (req, res) => {
     const {name, email, password} = req.body;
 
@@ -31,11 +32,11 @@ router.post('/signup', async (req, res) => {
 
     const formattedName = name.replace(/\s/g, "");
     if (formattedName.length < 3 || formattedName.length > 24) {
-        return res.status(422).json({message: 'Username should have between 3 and 24 non-space characters.'})
+        return res.status(422).json({message: 'Username should have between 3 and 24 non-space characters.'});
     }
 
     if (password.length < 6 || formattedName.length > 50) {
-        return res.status(422).json({message: 'Password should have between 6 and 50 characters.'})
+        return res.status(422).json({message: 'Password should have between 6 and 50 characters.'});
     }
 
     // Check if email exists
@@ -124,5 +125,74 @@ router.delete('/user/:user_id', async (req, res) => {
     res.cookie('token', '', {...cookieOptions, maxAge: 1});
     return res.status(200).json({message: 'Deleted account successfully.'});
 })
+
+// Get reviews
+router.get('/reviews', async (req, res) => {
+    try {
+        let page = parseInt(req?.query?.page) || 1;
+        let perPage = parseInt(req?.query?.perPage) || 10;
+
+        if (perPage > 10000) {
+            perPage = 10000;
+        }
+        if (perPage < 0) {
+            perPage = 10;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+
+        const offset = ((page - 1) * perPage);
+        const selectedReviews = await pool.query('SELECT * FROM reviews ORDER BY created_at LIMIT $1 OFFSET $2', [perPage, offset]);
+        return res.status(200).json({page: page, perPage: perPage, reviews: selectedReviews.rows});
+    } catch (reviewsError) {
+        return res.status(500).json({message: 'Failed to fetch reviews.'});
+    }
+})
+
+// Post review
+router.post('/reviews', verifyUser, async (req, res) => {
+    try {
+        const {rating, textContent, locationId} = req.body;
+        const verifiedUser = req.user;
+
+        if (!rating) {
+            return res.status(400).json({message: 'Missing required rating.'});
+        }
+        if (!locationId) {
+            return res.status(400).json({message: 'Missing required location id.'});
+        }
+        if (textContent && textContent.length > 500) {
+            return res.status(400).json({message: 'Text content must be 500 characters or less.'});
+        }
+        
+        const newReview = await pool.query('INSERT INTO reviews (rating, text_content, location_id, poster_id) VALUES ($1, $2, $3, $4) RETURNING location_id, rating, text_content, poster_id',
+            [rating, textContent, locationId, verifiedUser.user_id]
+        );
+        return res.status(200).json({newReview: newReview.rows[0]});
+    } catch (reviewsError) {
+        return res.status(500).json({message: 'Failed to fetch locations.'});
+    }
+})
+
+// Get locations
+router.get('/locations', async (req, res) => {
+    try {
+        const locationId = parseInt(req?.query?.id) || null;
+        let paramsList = [];
+
+        let query = 'SELECT * FROM locations';
+        if (locationId != null) {
+            query += ' WHERE location_id = $1';
+            paramsList.push(locationId);
+        }
+       
+        const selectedLocations = await pool.query(query, paramsList);
+        return res.status(200).json({locations: selectedLocations.rows});
+    } catch (reviewsError) {
+        return res.status(500).json({message: 'Failed to fetch locations.'});
+    }
+})
+
 
 export default router;
