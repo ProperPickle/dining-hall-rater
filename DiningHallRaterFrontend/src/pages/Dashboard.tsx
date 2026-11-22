@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as ReactBootstrap from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
@@ -9,10 +9,7 @@ import './Dashboard.css';
 const { Button } = ReactBootstrap;
 
 function Dashboard({user, setUser}) {
- 
-  const navigate = useNavigate();
-
-  const [diningHalls, setDiningHalls] = useState([
+ const [diningHalls, setDiningHalls] = useState([
     {
       id: 1,
       name: "De Neve",
@@ -99,6 +96,15 @@ function Dashboard({user, setUser}) {
     }
   ]);
 
+  const navigate = useNavigate();
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  const handleMarkerClick = (id: number) => {
+    setSelectedId(id);
+    itemRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
 
   const handleSignOut = async (e) => {
     e.preventDefault();
@@ -171,11 +177,17 @@ function Dashboard({user, setUser}) {
       <div className="dashboard-content">
         <div className="dining-hall-cards">
           {diningHalls.map((location) => (
-            <DiningHallCard key={location.id} location={location} />
+            <div
+              key={location.id}
+              ref={(el) => { itemRefs.current[location.id] = el; }}
+              className={`hall-wrapper ${selectedId === location.id ? 'selected' : ''}`}
+            >
+              <DiningHallCard location={location} />
+            </div>
           ))}
         </div>
         <div className="map-container">
-          <Map locations={diningHalls} />
+          <Map locations={diningHalls} onMarkerClick={handleMarkerClick} />
         </div>
       </div>
     </div>
