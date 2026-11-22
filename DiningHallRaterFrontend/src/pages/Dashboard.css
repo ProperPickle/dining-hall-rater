@@ -25,3 +25,12 @@
   padding: 16px;
   box-sizing: border-box;
 }
+
+.hall-wrapper {
+  border-radius: 10px;
+  transition: box-shadow 0.2s;
+}
+
+.hall-wrapper.selected {
+  box-shadow: 0 0 0 3px #3a5bd9;
+}

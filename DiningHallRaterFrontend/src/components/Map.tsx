@@ -2,7 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import './Map.css';
 import 'leaflet/dist/leaflet.css';
 
-export default function Map({ locations }) {
+export default function Map({ locations, onMarkerClick }) {
   const uclaPosition = [34.07, -118.44]; // [latitude, longitude]
 
   return (
@@ -13,7 +13,11 @@ export default function Map({ locations }) {
       />
       {locations.map((location) => (
         location.position && 
-        <Marker position={location.position} key={location.id} >
+        <Marker 
+          position={location.position} 
+          key={location.id} 
+          eventHandlers={{ click: () => onMarkerClick(location.id) }}
+        >
             <Popup>
                 Welcome to the {location.name}! <br /> Current Rating: NOT IMPLEMENTED
             </Popup>
