@@ -107,16 +107,12 @@ router.post('/signout', (req, res) => {
     res.status(200).json({message: 'Logged out successfully'});
 })
 
-// Delete account
-router.delete('/user/:user_id', async (req, res) => {
+// Delete a user's own account
+router.delete('/user', verifyUser, async (req, res) => {
     // Pull out the id of the user to be deleted
-    const {user_id} = req.params;
+    const verifiedUser = req.user;
 
-    if (user_id === undefined) {
-        return res.status(400).json({message: 'Invalid user.'});
-    }
-
-    const accountDeletion = await pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [user_id]);
+    const accountDeletion = await pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [verifiedUser.user_id]);
 
     if (accountDeletion.rows.length === 0) {
         return res.status(404).json({message: 'User not found.'});
