@@ -132,7 +132,7 @@ function Dashboard({user, setUser}) {
     e.preventDefault();
   
     try {
-      const accountDeletionResult = await fetch(`/api/auth/user/${user?.user_id}`, {
+      const accountDeletionResult = await fetch(`/api/auth/user`, {
         method: "DELETE",
         credentials: "include"
       });
