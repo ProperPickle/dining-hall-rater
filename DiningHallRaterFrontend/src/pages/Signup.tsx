@@ -61,7 +61,7 @@ function Signup({setUser}) {
             <input
               onChange={handleChange}
               type="text"
-              name="username"
+              name="name"
               id="username"
               placeholder="Username"
               autoComplete="username"
