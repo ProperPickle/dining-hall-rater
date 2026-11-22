@@ -140,7 +140,7 @@ function Dashboard({user, setUser}) {
       if (!accountDeletionResult.ok) {
         const accountDeletionResultJSON = await accountDeletionResult.json();
         console.error(accountDeletionResultJSON.message || "Could not delete account.");
-        return;
+        throw new Error();
       }
       
       setUser(null);
