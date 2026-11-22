@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import './Signup.css'
 
 function Signup({setUser}) {
@@ -12,6 +12,11 @@ function Signup({setUser}) {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }; 
 
   const handleSignUp = async (event) => {
     event.preventDefault(); // Prevents page from refreshing when the form is submitted
@@ -44,40 +49,63 @@ function Signup({setUser}) {
   };
 
   return (
-    <div>
-      <h1>Signup</h1>
-      <form onSubmit={handleSignUp}>
-        <input
-          onChange={(e) => setForm({...form, name: e.target.value})}
-          className="p-3 mt-2"
-          type="username"
-          name="username"
-          id="username"
-          placeholder="Username"
-        />
-        <input
-          onChange={(e) => setForm({...form, email: e.target.value})}
-          className="p-3 mt-2"
-          type="email"
-          name="email"
-          id="email"
-          placeholder="Email"
-        />
-        <input
-          onChange={(e) => setForm({...form, password: e.target.value})}
-          className="p-3 mt-2"
-          type="password"
-          name="password"
-          id="password"
-          placeholder="password"
-        />
-        <button type="submit" disabled={loading}>
-          Sign up
-        </button>
-        {error && <p>{error}</p>}
-      </form>
-    </div>
-  )
+    <main className='signup-page'>
+      <div className='signup-card'>
+        <h1 className='signup-title'>Sign Up</h1>
+        <p className='signup-subtitle'>Sign up to leave your own reviews</p>
+
+        <form className='signup-form' onSubmit={handleSignUp}>
+          <div className='field'>
+            <label htmlFor='email'>Username</label>
+            <input
+              onChange={handleChange}
+              type="username"
+              name="username"
+              id="username"
+              placeholder="Username"
+              required
+            />
+          </div>
+          <div className='field'>
+            <label htmlFor='email'>Email</label>
+            <input
+              onChange={handleChange}
+              type="email"
+              name="email"
+              id="email"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+          <div className='field'>
+            <label htmlFor='email'>Password</label>
+            <input
+              onChange={handleChange}
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Password"
+              required
+            />
+          </div>
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
+          <button type="submit" className="submit-btn" disabled={loading}>
+            Create account
+          </button>
+        </form>
+        <p className='signup-footer'>
+          Already have an account? <Link to="/signin">Sign In</Link>
+        </p>
+        <p className="signin-footer">
+          <Link to="/">Back as Guest</Link>
+        </p>
+      </div>
+    </main>
+  );
 
 }
 
