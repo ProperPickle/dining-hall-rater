@@ -3,7 +3,8 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import pool from '../config/db.ts';
 import { cookie } from 'express/lib/response.js';
-import { verifyUser } from '../middleware/auth.ts'
+import { verifyUser } from '../middleware/auth.ts';
+import { rateLimit } from 'express-rate-limit';
 import { parse } from 'dotenv';
 
 const router = express.Router();
@@ -21,6 +22,21 @@ const generateToken = (user_id) => {
         expiresIn: '30d'
     });
 }
+
+// Using the express' rate-limit package to limit the number of login attempts
+// Reads as: 5 maximum login attempts in one hour (in ms). Successful requests will not increment the failed counter, and a message is provided after maximum attempts are taken.
+const loginLimiter = rateLimit({
+    max: 5,
+    windowMs: 60 * 60 * 1000,
+    skipSuccessfulRequests: true,
+    message: 'Too many login attempts. Please try again in twenty-four hours.',
+    handler: (req, res, next, options) => {
+    res.status(options.statusCode || 429).json({
+      status: 'fail',
+      message: options.message
+    });
+  }
+});
 
 // Sign up
 router.post('/signup', async (req, res) => {
@@ -72,10 +88,10 @@ router.post('/signup', async (req, res) => {
 })
 
 // Login
-router.post('/signin', async (req, res) => {
+router.post('/signin', loginLimiter, async (req, res) => {
     const {email, password} = req.body;
     if (!email || !password) {
-        return res.status(400).json({message: "Please provide all reqiured fields."});
+        return res.status(400).json({message: "Please provide all required fields."});
     }
 
     const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
