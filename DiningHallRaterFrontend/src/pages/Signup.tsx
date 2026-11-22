@@ -10,6 +10,7 @@ function Signup({setUser}) {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -51,21 +52,23 @@ function Signup({setUser}) {
   return (
     <main className='signup-page'>
       <div className='signup-card'>
-        <h1 className='signup-title'>Sign Up</h1>
-        <p className='signup-subtitle'>Sign up to leave your own reviews</p>
+        <h1 className='signup-title'>Create an account</h1>
+        <p className='signup-subtitle'>Create an account to leave your own reviews</p>
 
         <form className='signup-form' onSubmit={handleSignUp}>
           <div className='field'>
-            <label htmlFor='email'>Username</label>
+            <label htmlFor='username'>Username</label>
             <input
               onChange={handleChange}
-              type="username"
+              type="text"
               name="username"
               id="username"
               placeholder="Username"
+              autoComplete="username"
               required
             />
           </div>
+
           <div className='field'>
             <label htmlFor='email'>Email</label>
             <input
@@ -74,39 +77,54 @@ function Signup({setUser}) {
               name="email"
               id="email"
               placeholder="you@example.com"
+              autoComplete="email"
               required
             />
           </div>
+
           <div className='field'>
-            <label htmlFor='email'>Password</label>
-            <input
-              onChange={handleChange}
-              type="password"
-              name="password"
-              id="password"
-              placeholder="Password"
-              required
-            />
+            <label htmlFor='password'>Password</label>
+            <div className='password-wrap'>
+              <input
+                onChange={handleChange}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="password"
+                placeholder="Password"
+                autoComplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
+
           {error && (
             <p className="form-error" role="alert">
               {error}
             </p>
           )}
+
           <button type="submit" className="submit-btn" disabled={loading}>
-            Create account
+            {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
+
         <p className='signup-footer'>
           Already have an account? <Link to="/signin">Sign In</Link>
         </p>
-        <p className="signin-footer">
+        <p className="signup-footer">
           <Link to="/">Back as Guest</Link>
         </p>
       </div>
     </main>
   );
-
 }
 
 export default Signup

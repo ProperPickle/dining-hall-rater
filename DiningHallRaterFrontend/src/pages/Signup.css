@@ -71,6 +71,39 @@
   box-shadow: 0 0 0 3px rgba(58, 91, 217, 0.18);
 }
 
+/* Show / hide password */
+.signup-form .password-wrap {
+  position: relative;
+}
+
+.signup-form .password-wrap input {
+  padding-right: 64px;
+}
+
+.signup-form .toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3a5bd9;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.signup-form .toggle-password:hover {
+  background: #eef1fc;
+}
+
+.signup-form .toggle-password:focus-visible {
+  outline: 2px solid #3a5bd9;
+}
+
+/* Error message */
 .signup-form .form-error {
   margin: 0;
   padding: 10px 12px;
@@ -81,6 +114,7 @@
   border-radius: 8px;
 }
 
+/* Submit button */
 .signup-form .submit-btn {
   padding: 12px;
   font-size: 1rem;
@@ -111,6 +145,7 @@
   cursor: not-allowed;
 }
 
+/* Footer links */
 .signup-footer {
   margin: 24px 0 0;
   text-align: center;
