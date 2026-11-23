@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button, Card } from "react-bootstrap";
 import { Rating } from "react-simple-star-rating";
+import { shortenNumber, calculateAverageRating } from "../Helpers";
 
 export default function DiningHallCard({ location }) {
   // Rating for the star system
@@ -14,22 +15,11 @@ export default function DiningHallCard({ location }) {
     setRating(rate);
   };
 
-  // Abbreviates numbers above 999 into formats like 1.5K, 3M, etc.
-  const shortenNumber = (number) => {
-      const formatFunction = new Intl.NumberFormat(undefined, {
-          notation: "compact",
-          compactDisplay: "short"
-      });
-
-      return formatFunction.format(number);
-  }
-
   // On initial mount, set average rating, and round it to two decimal places
   useEffect(() => {
     if (location.num_ratings >= 1) {
       setTotalRatings(location.num_ratings);
-      const averageRatingCalculation = location.sum_ratings / location.num_ratings;
-      setAverageRating(parseFloat(averageRatingCalculation.toFixed(2)));
+      setAverageRating(calculateAverageRating(location.num_ratings, location.sum_ratings));
     }
   }, []);
 
