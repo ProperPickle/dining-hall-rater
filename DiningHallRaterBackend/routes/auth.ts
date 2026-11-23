@@ -187,6 +187,27 @@ router.post('/reviews', verifyUser, async (req, res) => {
     }
 })
 
+// Delete a user's own review
+router.delete('/reviews/:review_id', verifyUser, async (req, res) => {
+    try {
+        const {review_id} = req.params;
+        const verifiedUser = req.user;
+
+        if (!review_id) {
+            return res.status(400).json({message: 'Missing required review id.'});
+        }
+       
+        const reviewDeletion = await pool.query('DELETE FROM reviews WHERE poster_id = $1 AND review_id = $2 RETURNING *', [verifiedUser.user_id, review_id]);
+        if (reviewDeletion.rows.length === 0) {
+            return res.status(404).json({message: 'Could not find that review.'});
+        }
+
+        return res.status(200).json({message: "Deleted review successfully."});
+    } catch (reviewsDeletionError) {
+        return res.status(500).json({message: 'Failed to delete review.'});
+    }
+})
+
 // Get locations
 router.get('/locations', async (req, res) => {
     try {
