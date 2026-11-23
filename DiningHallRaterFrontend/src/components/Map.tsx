@@ -12,11 +12,11 @@ export default function Map({ locations, onMarkerClick }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {locations.map((location) => (
-        location.position && 
+        location.lat && location.lng && 
         <Marker 
-          position={location.position} 
-          key={location.id} 
-          eventHandlers={{ click: () => onMarkerClick(location.id) }}
+          position={[location.lat, location.lng]} 
+          key={location.location_id} 
+          eventHandlers={{ click: () => onMarkerClick(location.location_id) }}
         >
             <Popup>
                 Welcome to the {location.name}! <br /> Current Rating: NOT IMPLEMENTED
